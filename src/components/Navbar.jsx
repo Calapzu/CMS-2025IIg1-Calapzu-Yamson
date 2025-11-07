@@ -6,7 +6,7 @@ import { useAuth } from "../hooks/useAuth";
 import Button from "./ui/Button";
 
 export default function Navbar() {
-  const { user, profile } = useAuthContext();
+  const { user, profile, role } = useAuthContext();
   const { signOut } = useAuth();
   const [mobileMenuOpen, setMobileMenuOpen] = useState(false);
 
@@ -18,12 +18,20 @@ export default function Navbar() {
     }
   };
 
+  // 🔹 Define enlaces y roles
   const navLinks = [
     { to: "/", label: "INICIO" },
-    { to: "/secciones", label: "SECCIONES" },
-    user && { to: "/dashboard", label: "DASHBOARD" },
-    user && { to: "/noticia/nueva", label: "ESCRIBIR", variant: "primary" },
-  ].filter(Boolean);
+    { to: "/dashboard", label: "DASHBOARD", roles: ["reportero", "editor"] },
+    { to: "/dashboard/noticias/nueva", label: "ESCRIBIR", roles: ["reportero", "editor"] },
+    { to: "/dashboard/secciones", label: "GESTIONAR SECCIONES", roles: ["editor"] }
+  ];
+
+  // 🔹 Filtra enlaces según rol
+  const filteredLinks = navLinks.filter(link => {
+    if (!link.roles) return true; // público
+    if (!user) return false;      // requiere login
+    return link.roles.includes(role);
+  });
 
   return (
     <header className="sticky top-0 z-50 bg-white dark:bg-black border-b-4 border-red-600 shadow-xl">
@@ -43,7 +51,7 @@ export default function Navbar() {
 
           {/* DESKTOP MENU */}
           <div className="hidden md:flex items-center gap-8">
-            {navLinks.map((link) => (
+            {filteredLinks.map(link => (
               <NavLink
                 key={link.to}
                 to={link.to}
@@ -62,7 +70,7 @@ export default function Navbar() {
             {user ? (
               <div className="flex items-center gap-4 border-l-2 border-red-600 pl-6">
                 <div className="text-right">
-                  <p className="text-xs text-gray-500 uppercase">Reportero</p>
+                  <p className="text-xs text-gray-500 uppercase">{role || "Usuario"}</p>
                   <p className="font-bold text-gray-900 dark:text-white">
                     {profile?.nombre || "Calapzu"}
                   </p>
@@ -110,7 +118,7 @@ export default function Navbar() {
         {mobileMenuOpen && (
           <div className="md:hidden bg-white dark:bg-black border-t-2 border-red-600">
             <div className="px-4 pt-4 pb-6 space-y-4">
-              {navLinks.map((link) => (
+              {filteredLinks.map(link => (
                 <NavLink
                   key={link.to}
                   to={link.to}
@@ -131,16 +139,10 @@ export default function Navbar() {
                 <div className="pt-6 border-t-2 border-red-600">
                   <div className="flex items-center justify-between mb-4">
                     <div>
-                      <p className="text-sm text-gray-500">Reportero activo</p>
-                      <p className="font-bold text-lg">
-                        {profile?.nombre || "Calapzu"}
-                      </p>
+                      <p className="text-sm text-gray-500">Usuario activo</p>
+                      <p className="font-bold text-lg">{profile?.nombre || "Calapzu"}</p>
                     </div>
-                    <Button
-                      variant="danger"
-                      size="sm"
-                      onClick={handleSignOut}
-                    >
+                    <Button variant="danger" size="sm" onClick={handleSignOut}>
                       SALIR
                     </Button>
                   </div>
@@ -159,3 +161,4 @@ export default function Navbar() {
     </header>
   );
 }
+

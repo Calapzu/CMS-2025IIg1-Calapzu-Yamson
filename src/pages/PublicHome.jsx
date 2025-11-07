@@ -14,15 +14,20 @@ export default function PublicHome() {
 
     useEffect(() => {
         const load = async () => {
+            // 1️⃣ Refrescar la vista materializada (para desarrollo o pequeñas apps)
+            await supabase.rpc('refresh_noticias_public_view');
+
+            // 2️⃣ Cargar secciones
             const { data: secc } = await supabase
                 .from('secciones')
                 .select('id, nombre, slug')
                 .order('nombre');
             setSecciones(secc || []);
 
+            // 3️⃣ Cargar noticias
             let q = supabase
                 .from('noticias_public_view')
-                .select('id, titulo, subtitulo, imagen_url, fecha_actualizacion, seccion_slug, seccion_nombre') // ← AQUÍ ESTÁ LA CLAVE
+                .select('id, titulo, subtitulo, imagen_url, fecha_actualizacion, seccion_slug, seccion_nombre')
                 .order('fecha_actualizacion', { ascending: false })
                 .limit(24);
 
@@ -31,6 +36,7 @@ export default function PublicHome() {
             const { data: news } = await q;
             setNoticias(news || []);
         };
+
         load();
     }, [seccion]);
 

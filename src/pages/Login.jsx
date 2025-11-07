@@ -27,7 +27,7 @@ export default function Login() {
 
 
     return (
-       <div className="max-w-md mx-auto p-6 bg-white dark:bg-gray-900 rounded-3xl shadow-2xl">
+       <div className="max-w-md mx-auto mt-10 p-6 bg-white dark:bg-gray-900 rounded-3xl shadow-2xl">
             <h1 className="text-3xl font-black text-center text-gray-900 dark:text-white mb-6">Iniciar sesión</h1>
             <form onSubmit={submit} className="space-y-6">
                 <input
