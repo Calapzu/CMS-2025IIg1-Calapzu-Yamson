@@ -1,0 +1,55 @@
+@import "tailwindcss";
+
+/* === Tus temas personalizados === */
+@theme {
+  --color-brand-50: #eef6ff;
+  --color-brand-100: #dceefe;
+  --color-brand-200: #bcdcff;
+  --color-brand-300: #93c5fd;
+  --color-brand-400: #60a5fa;
+  --color-brand-500: #3b82f6;
+  --color-brand-600: #2563eb;
+  --color-brand-700: #1d4ed8;
+  --color-brand-800: #1e40af;
+  --color-brand-900: #1e3a8a;
+
+  --shadow-card: 0 6px 24px rgba(0,0,0,0.06);
+
+  --radius-xl: 1rem;
+  --radius-2xl: 1.25rem;
+}
+
+/* === Utilidades personalizadas === */
+
+body {
+  @apply bg-gray-50 text-gray-900;
+}
+
+.container {
+  @apply mx-auto max-w-7xl px-3 sm:px-6;
+}
+
+.btn {
+  @apply inline-flex items-center justify-center rounded-lg px-4 py-2 font-medium transition shadow-sm hover:shadow;
+}
+
+.btn-primary {
+  @apply bg-brand-600 text-white hover:bg-brand-700;
+}
+
+.btn-ghost {
+  @apply bg-white text-gray-700 border border-gray-200 hover:bg-gray-50;
+}
+
+.input {
+  @apply w-full rounded-lg border border-gray-300 bg-white px-3 py-2 outline-none focus:ring-2 focus:ring-brand-500;
+}
+
+.label {
+  @apply block text-sm font-medium text-gray-700;
+}
+
+.card {
+  @apply bg-white rounded-2xl shadow-card;
+}
+
