@@ -1,24 +1,51 @@
-# Logs
-logs
-*.log
+# --- Node & dependencies ---
+node_modules/
 npm-debug.log*
 yarn-debug.log*
 yarn-error.log*
 pnpm-debug.log*
-lerna-debug.log*
 
-node_modules
-dist
-dist-ssr
-*.local
+# --- Build output ---
+dist/
+build/
 
-# Editor directories and files
-.vscode/*
-!.vscode/extensions.json
-.idea
-.DS_Store
+# --- Local environment variables ---
+.env
+.env.local
+.env.*.local
+
+# --- Vercel config cache ---
+.vercel/
+.vercel_build_output/
+
+# --- Logs ---
+logs
+*.log
+*.log.*
+pids
+*.pid
+*.seed
+*.pid.lock
+
+# --- Editor / IDE ---
+.vscode/
+.idea/
 *.suo
 *.ntvs*
 *.njsproj
 *.sln
-*.sw?
+
+# --- macOS / Windows cruft ---
+.DS_Store
+Thumbs.db
+
+# --- Supabase local dev (si usas supabase CLI) ---
+supabase/.temp/
+supabase/.branches/
+supabase/.env
+
+# --- Optional: test coverage / caches ---
+coverage/
+.cache/
+.eslintcache
+
