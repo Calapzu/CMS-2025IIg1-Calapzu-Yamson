@@ -6,10 +6,10 @@ export const useAuthContext = () => useContext(AuthContext);
 
 export const AuthProvider = ({ children }) => {
   const [session, setSession] = useState(null);
-  const [profile, setProfile] = useState(null); // perfil completo con rol
+  const [profile, setProfile] = useState(null);
   const [loading, setLoading] = useState(true);
 
-  // Obtener perfil de la tabla users
+  // Obtener perfil desde tabla users
   const fetchProfile = async (uid) => {
     try {
       const { data, error } = await supabase
@@ -31,23 +31,21 @@ export const AuthProvider = ({ children }) => {
     const init = async () => {
       const { data: { session } } = await supabase.auth.getSession();
       if (!isMounted) return;
+
       setSession(session);
 
       if (session?.user?.id) {
         await fetchProfile(session.user.id);
       }
+
       setLoading(false);
     };
     init();
 
-    const { data: { subscription } } = supabase.auth.onAuthStateChange(async (_event, session) => {
-      setSession(session);
-
-      if (session?.user?.id) {
-        await fetchProfile(session.user.id);
-      } else {
-        setProfile(null);
-      }
+    const { data: { subscription } } = supabase.auth.onAuthStateChange(async (_event, newSession) => {
+      setSession(newSession);
+      if (newSession?.user?.id) await fetchProfile(newSession.user.id);
+      else setProfile(null);
     });
 
     return () => {
@@ -59,10 +57,9 @@ export const AuthProvider = ({ children }) => {
   return (
     <AuthContext.Provider value={{
       session,
-      setSession,
       user: session?.user ?? null,
-      profile, // ahora incluye nombre, email y rol
-      role: profile?.rol ?? null, // acceso rápido al rol
+      profile,
+      role: profile?.rol ?? null,
       loading
     }}>
       {children}

@@ -1,61 +1,55 @@
 import { supabase } from '../services/supabaseClient';
 
 export function useAuth() {
-  // Login
+
   const signIn = async ({ email, password }) => {
     try {
       const { data, error } = await supabase.auth.signInWithPassword({ email, password });
       if (error) throw error;
-      return data;
+      return { success: true, user: data.user };
     } catch (err) {
       console.error("❌ Error en login:", err.message);
-      throw err;
+      return { success: false, message: err.message };
     }
   };
 
-  // Registro (opcional)
   const signUp = async ({ email, password, nombre, rol = "reportero" }) => {
     try {
-      const { data, error } = await supabase.auth.signUp({ email, password });
-      if (error) throw error;
+      // 1️⃣ Crear usuario en Auth
+      const { data, error: signUpError } = await supabase.auth.signUp({ email, password });
+      if (signUpError) throw new Error(signUpError.message);
 
       const user = data.user;
-      if (!user) throw new Error("No se pudo crear el usuario");
+      if (!user) throw new Error("No se pudo obtener el usuario tras el registro.");
 
-      // Guardar perfil en tabla users con rol dinámico
-      const { error: insertErr } = await supabase
+      // 2️⃣ Guardar datos extra en tabla users
+      const { error: insertError } = await supabase
         .from("users")
-        .insert({
-          id: user.id,
-          nombre,
-          email,
-          rol, // puede ser 'reportero' o 'editor'
-        });
-      if (insertErr) throw insertErr;
+        .insert([{ id: user.id, nombre, email, rol }]);
+      if (insertError) throw new Error(insertError.message);
 
-      return data;
+      // 3️⃣ Iniciar sesión automáticamente
+      const { data: loginData, error: loginError } = await supabase.auth.signInWithPassword({ email, password });
+      if (loginError) throw new Error(loginError.message);
+
+      return { success: true, message: "Usuario registrado y logueado correctamente.", user: loginData.user };
+
     } catch (err) {
       console.error("❌ Error en registro:", err.message);
-      throw err;
+      return { success: false, message: err.message };
     }
   };
-
 
   const signOut = async () => {
     try {
-      console.log("🚪 Cerrando sesión global...");
-
-      // 1️⃣ Cierra sesión en Supabase
       const { error } = await supabase.auth.signOut();
       if (error) throw error;
-
-      // 2️⃣ Forzar recarga completa de la app
-      // Esto limpia todo estado de React y contextos
       window.location.href = '/login';
     } catch (err) {
-      console.error("❌ Error cerrando sesión:", err);
+      console.error("❌ Error cerrando sesión:", err.message);
     }
   };
 
   return { signIn, signUp, signOut };
 }
+
